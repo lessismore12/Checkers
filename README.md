@@ -1,0 +1,2 @@
+# checkers
+minimax checkers game
