@@ -209,7 +209,7 @@ public class Checkers extends JFrame
        }//for1
        return blue - red;
    }//minimax
-
+//test
    public static void main(String [] args)
    {
         //*** create a new game and make it visible
