@@ -28,6 +28,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.applet.*;
 import java.net.*;
+import java.util.ArrayList;
 
 //***********************************************************************
 public class Checkers extends JFrame
@@ -214,7 +215,15 @@ public class Checkers extends JFrame
    {
         //*** create a new game and make it visible
         Checkers game = new Checkers();
+        int alpha = Integer.MAX_VALUE;
+        int beta = Integer.MIN_VALUE;
 
+        for (int i = 0; i < game.board.getX(); i++){
+            for (int j = 0; j < game.board.getY(); j++){
+                break;
+            }
+            break;
+        }
 
         //*** arbitrarily move a few pieces around
         //while (!game.done())
