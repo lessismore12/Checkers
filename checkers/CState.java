@@ -25,7 +25,25 @@ class CState
           this.state = state;
           this.type  = type;
       }
-
+      
+      public int minimax(GameBoard board){
+          int red = 0;
+          int blue = 0;
+          
+          for (int i = 0; i < state.length; i++){
+              for (int j = 0; j < state.length; j++){
+                  if (state[i][j] == 1)
+                      blue += 1;
+                  if (state[i][j] == 2)
+                      blue += 5;
+                  if (state[i][j] == 3)
+                      red += 1;
+                  if (state[i][j] == 4)
+                      red += 5;
+              }//end for 2
+          }//for1
+          return blue - red;
+      }//minimax
       //**************************************************************
       //*** evaluate a state based on the evaluation function we
       //*** discussed in class
@@ -33,7 +51,9 @@ class CState
       {
          //*** add your own necessary logic here to properly evaluate a state
          //*** I am just assigning some random numbers for demonstration purposes
-         e = Math.random()*10;
+         GameBoard board = new GameBoard(state);
+         
+    	 e = minimax(board);
       }
 
       //**************************************************************

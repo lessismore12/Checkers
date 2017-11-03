@@ -42,14 +42,24 @@ public class Checkers extends JFrame
    */
    private static int [][] boardPlan =
       {
-         {1, 2, 0, 0, 0, 0, 0, 0},   //*** blue pieces become king here
-         {3, 4, 0, 0, 0, 0, 0, 0},
+    	 {0, 0, 0, 0, 0, 0, 0, 0},   //*** blue pieces become king here
+     	 {0, 0, 0, 0, 0, 0, 0, 0},
+     	 {0, 0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 4, 0, 0, 0},
+         {0, 0, 0, 1, 0, 0, 0, 0},
          {0, 0, 0, 0, 0, 0, 0, 0},
          {0, 0, 0, 0, 0, 0, 0, 0},
-         {0, 0, 0, 0, 0, 0, 0, 1},
-         {1, 0, 4, 0, 3, 0, 0, 0},
+         {0, 0, 0, 0, 1, 0, 0, 0}
+    	 /**
+         {0, 3, 0, 3, 0, 3, 0, 3},   //*** blue pieces become king here
+         {3, 0, 3, 0, 3, 0, 3, 0},
+         {0, 3, 0, 3, 0, 3, 0, 3},
          {0, 0, 0, 0, 0, 0, 0, 0},
-         {0, 0, 0, 0, 2, 0, 0, 0}    //*** red pieces become king here
+         {0, 0, 0, 0, 0, 0, 0, 0},
+         {1, 0, 1, 0, 1, 0, 1, 0},
+         {0, 1, 0, 1, 0, 1, 0, 1},
+         {1, 0, 1, 0, 1, 0, 1, 0}    //*** red pieces become king here
+      	 **/
       };
 
    //*** the legend strings
@@ -193,9 +203,10 @@ public class Checkers extends JFrame
    //***********************************************************************
    //*** incorporate your MINIMAX algorithm in here
    //***********************************************************************
-   public int minimax(int[][] board){
+   public int minimax(GameBoard board){
        int red = 0;
        int blue = 0;
+       
        for (int i = 0; i < Checkers.boardPlan.length; i++){
            for (int j = 0; j < Checkers.boardPlan.length; j++){
                if (Checkers.boardPlan[i][j] == 1)
@@ -210,14 +221,214 @@ public class Checkers extends JFrame
        }//for1
        return blue - red;
    }//minimax
-//test
+   
+   
+   public ArrayList<int[]> moveScanner(GameBoard board, int turn){
+       ArrayList<int[]> positions = new ArrayList<int[]>();
+       
+       for (int i = 0; i < boardPlan.length; i++){
+           for (int j = 0; j < boardPlan.length; j++) {
+        	   if(turn == 0) {
+               if (Checkers.boardPlan[i][j] == 1 || Checkers.boardPlan[i][j] == 2){
+            	   if (Checkers.boardPlan[i + 1][j + 1] == 0)
+                       positions.add(new int[] { i, j });
+                   else if (Checkers.boardPlan[i + 1][j - 1] == 0)
+                       positions.add(new int[] { i, j });
+                   else if(Checkers.boardPlan[i + 1][i + 1] == 3 || Checkers.boardPlan[i + 1][i + 1] == 4) {
+                	   if(legalPosition(i + 2) && legalPosition(j + 2)) {
+	                	   if(Checkers.boardPlan[i + 2][j + 2] == 0) {
+	                		   positions.add(new int[] { i, j });
+	                	   }
+                	   }
+                   }
+                   else if(Checkers.boardPlan[i + 1][j - 1] == 3 || Checkers.boardPlan[i + 1][j - 1] == 4) {
+                	   if(legalPosition(i + 2) && legalPosition(j - 2)) {
+                		   if(Checkers.boardPlan[i + 2][j - 2] == 0) {
+                			   positions.add(new int[] {i, j});
+                		   }
+                	   }
+                   }
+                   else {
+                	   if(Checkers.boardPlan[i][j] == 2) {
+                		   if (Checkers.boardPlan[i - 1][j - 1] == 0)
+                               positions.add(new int[] { i, j });
+                		   else if (Checkers.boardPlan[i - 1][j + 1] == 0)
+                               positions.add(new int[] { i, j });
+                		   else if (Checkers.boardPlan[i - 1][j - 1] == 3 || Checkers.boardPlan[i - 1][j - 1] == 4) {
+                			   if(legalPosition(i - 2) && legalPosition(j - 2)) {
+                				   if(Checkers.boardPlan[i - 1][j - 1] == 0) {
+                					   positions.add(new int [] { i, j});
+                				   }
+                			   }
+                		   }
+                	   }
+                   }
+                   
+               }//end if
+        	   }
+        	   if (turn == 1) {
+	               if (Checkers.boardPlan[i][j] == 2 || Checkers.boardPlan[i][j] == 4){
+	                   if (Checkers.boardPlan[i + 1][j + 1] == 0)
+	                       positions.add(new int[] { i, j });
+	                   else if (Checkers.boardPlan[i - 1][j + 1] == 0)
+	                       positions.add(new int[] { i, j });
+	                   else if (Checkers.boardPlan[i + 1][j - 1] == 0)
+	                       positions.add(new int[] { i, j });
+	                   else if (Checkers.boardPlan[i - 1][j - 1] == 0)
+	                       positions.add(new int[] { i, j });
+	               }//end else if
+        	   }
+           }//end for 2
+       }//end for 1
+       return positions;
+   }//end moveScanner
+   
+   
+   //Param: state all possible movement, turn 0 is blue's turn. turn 1 is red's turn
+   public void getPosMove(ArrayList<int[]> state, int turn, ArrayList<int[]> moves) {
+	   
+	   if(turn == 0) {
+		   for(int x = 0; x < state.size(); x++) {
+			   if(Checkers.boardPlan[state.get(x)[0]][state.get(x)[1]] == 1 || Checkers.boardPlan[state.get(x)[0]][state.get(x)[1]] == 2) {
+				   if(legalPosition(state.get(x)[0]-1) && legalPosition(state.get(x)[1]+1)) {
+					   if(Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]+1] == 3 || Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]+1] == 4) {
+						   if(Checkers.boardPlan[state.get(x)[0]-2][state.get(x)[1]+2] == 0) {
+							   moves.add(new int[] {state.get(x)[0]-2, state.get(x)[1]+2, state.get(x)[0], state.get(x)[1]});
+						   }
+					   }
+					   else if(Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]+1] == 0) {
+						   moves.add(new int[] {state.get(x)[0]-1, state.get(x)[1]+1, state.get(x)[0], state.get(x)[1]});
+					   }
+					   else {
+						   
+					   }
+				   }
+				   
+				   if(legalPosition(state.get(x)[0]-1) && legalPosition(state.get(x)[1]-1)) {
+					   if(Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]-1] == 3 || Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]-1] == 4) {
+						   if(Checkers.boardPlan[state.get(x)[0]-2][state.get(x)[1]-2] == 0) {
+							   moves.add(new int[] {state.get(x)[0]-2, state.get(x)[1]-2, state.get(x)[0], state.get(x)[1]});
+						   }
+					   }
+					   else if(Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]-1] == 0) {
+						   moves.add(new int[] {state.get(x)[0]-1, state.get(x)[1]-1, state.get(x)[0], state.get(x)[1]});
+					   }
+					   else {
+						   
+					  }
+				   }
+				   if(Checkers.boardPlan[state.get(x)[0]][state.get(x)[1]] == 2) {
+					   if(legalPosition(state.get(x)[0]+1) && legalPosition(state.get(x)[1]+1)) {
+						   if(Checkers.boardPlan[state.get(x)[0]+1][state.get(x)[1]+1] == 3 || Checkers.boardPlan[state.get(x)[0]+1][state.get(x)[1]+1] == 4) {
+							   if(Checkers.boardPlan[state.get(x)[0]+2][state.get(x)[1]+2] == 0) {
+								   moves.add(new int[] {state.get(x)[0]+2, state.get(x)[1]+2, state.get(x)[0], state.get(x)[1]});
+							   }
+						   }
+						   else if(Checkers.boardPlan[state.get(x)[0]+1][state.get(x)[1]+1] == 0) {
+							   moves.add(new int[] {state.get(x)[0]+1, state.get(x)[1]+1, state.get(x)[0], state.get(x)[1]});
+						   }
+						   else {
+							   
+						   }
+					   }
+					   if(legalPosition(state.get(x)[0]+1) && legalPosition(state.get(x)[1]-1)) {
+						   if(Checkers.boardPlan[state.get(x)[0]+1][state.get(x)[1]-1] == 3 || Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]-1] == 4) {
+							   if(Checkers.boardPlan[state.get(x)[0]+2][state.get(x)[1]-2] == 0) {
+								   moves.add(new int[] {state.get(x)[0]+2, state.get(x)[1]-2, state.get(x)[0], state.get(x)[1]});
+							   }
+						   }
+						   else if(Checkers.boardPlan[state.get(x)[0]+1][state.get(x)[1]-1] == 0) {
+							   moves.add(new int[] {state.get(x)[0]+1, state.get(x)[1]-1, state.get(x)[0], state.get(x)[1]});
+						   }
+						   else {
+							   
+						   }
+					   }
+				   }
+			   }
+		   }
+		   
+	   }
+	   
+	   if(turn == 1) {
+		   for(int x = 0; x < state.size(); x++) {
+			   if(Checkers.boardPlan[state.get(x)[0]][state.get(x)[1]] == 3 || Checkers.boardPlan[state.get(x)[0]][state.get(x)[1]] == 4) {
+				   if(legalPosition(state.get(x)[0]+1) && legalPosition(state.get(x)[1]+1)) {
+					   if(Checkers.boardPlan[state.get(x)[0]+1][state.get(x)[1]+1] == 1 || Checkers.boardPlan[state.get(x)[0]+1][state.get(x)[1]+1] == 2) {
+						   if(Checkers.boardPlan[state.get(x)[0]+2][state.get(x)[1]+2] == 0) {
+							   moves.add(new int[] {state.get(x)[0]+2, state.get(x)[1]+2, state.get(x)[0], state.get(x)[1]});
+						   }
+					   }
+					   else if(Checkers.boardPlan[state.get(x)[0]+1][state.get(x)[1]+1] == 0) {
+						   moves.add(new int[] {state.get(x)[0]+1, state.get(x)[1]+1, state.get(x)[0], state.get(x)[1]});
+					   }
+					   else {
+						   
+					   }
+				   }
+				   if(legalPosition(state.get(x)[0]+1) && legalPosition(state.get(x)[1]-1)) {
+					   if(Checkers.boardPlan[state.get(x)[0]+1][state.get(x)[1]-1] == 1 || Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]-1] == 2) {
+						   if(Checkers.boardPlan[state.get(x)[0]+2][state.get(x)[1]-2] == 0) {
+							   moves.add(new int[] {state.get(x)[0]+2, state.get(x)[1]-2, state.get(x)[0], state.get(x)[1]});
+						   }
+					   }
+					   else if(Checkers.boardPlan[state.get(x)[0]+1][state.get(x)[1]-1] == 0) {
+						   moves.add(new int[] {state.get(x)[0]+1, state.get(x)[1]-1, state.get(x)[0], state.get(x)[1]});
+					   }
+					   else {
+						   
+					   }
+				   }
+				   if(Checkers.boardPlan[state.get(x)[0]][state.get(x)[1]] == 4) {
+					   if(legalPosition(state.get(x)[0]-1) && legalPosition(state.get(x)[1]+1)) {
+						   if(Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]+1] == 1 || Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]+1] == 2) {
+							   if(Checkers.boardPlan[state.get(x)[0]-2][state.get(x)[1]+2] == 0) {
+								   moves.add(new int[] {state.get(x)[0]-2, state.get(x)[1]+2, state.get(x)[0], state.get(x)[1]});
+							   }
+						   }
+						   else if(Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]+1] == 0) {
+							   moves.add(new int[] {state.get(x)[0]-1, state.get(x)[1]+1, state.get(x)[0], state.get(x)[1]});
+						   }
+						   else {
+							   
+						   }
+					   }
+					   
+					   if(legalPosition(state.get(x)[0]-1) && legalPosition(state.get(x)[1]-1)) {
+						   if(Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]-1] == 1 || Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]-1] == 2) {
+							   if(Checkers.boardPlan[state.get(x)[0]-2][state.get(x)[1]-2] == 0) {
+								   moves.add(new int[] {state.get(x)[0]-2, state.get(x)[1]-2, state.get(x)[0], state.get(x)[1]});
+							   }
+						   }
+						   else if(Checkers.boardPlan[state.get(x)[0]-1][state.get(x)[1]-1] == 0) {
+							   moves.add(new int[] {state.get(x)[0]-1, state.get(x)[1]-1, state.get(x)[0], state.get(x)[1]});
+						   }
+						   else {
+							   
+						  }
+					   }
+					   
+				   }
+			   }
+		   }
+		   
+	   }
+	   
+   }
+   //test
    public static void main(String [] args)
    {
         //*** create a new game and make it visible
         Checkers game = new Checkers();
         int alpha = Integer.MAX_VALUE;
         int beta = Integer.MIN_VALUE;
-
+        
+        ArrayList<int[]> move = new ArrayList<int[]>();
+        ArrayList<int[]> moves = new ArrayList<int[]>();
+        //move.add(new int[] {4,3});
+        //move.add(new int[] {7,4});
+        move = game.moveScanner(game.board, 0);
+        
         for (int i = 0; i < game.board.getX(); i++){
             for (int j = 0; j < game.board.getY(); j++){
                 break;
@@ -230,6 +441,20 @@ public class Checkers extends JFrame
         {
             try
                {
+            	for(int x = 0; x < move.size(); x++) {
+             	   System.out.println("Can Moves [" + move.get(x)[0] + "," + move.get(x)[1] + "]");
+                }
+            	
+               //System.out.println(game.minimax(game.board));
+               
+               //game.getPosMove(move, 0, moves);
+               
+            	/**
+               for(int x = 0; x < moves.size(); x++) {
+            	   System.out.println("Possible Moves [" + moves.get(x)[0] + "," + moves.get(x)[1] + "] Parent: [" + moves.get(x)[2] + "," + moves.get(x)[3] + "]");
+               }
+               **/
+               /**
                //*** move a bs piece from board[4][7] to board[3][6]
                game.movePiece(4, 7, 3, 6, "bs");
 
@@ -253,6 +478,7 @@ public class Checkers extends JFrame
                game.movePiece(3, 6, 2, 5, "bs");
                game.movePiece(2, 5, 1, 4, "bs");
                game.movePiece(1, 4, 0, 3, "bs");
+               **/
                }
 
            catch (IllegalMoveException e)
